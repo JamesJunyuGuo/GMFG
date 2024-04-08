@@ -2,7 +2,10 @@ import numpy as np
 from scipy.optimize import minimize_scalar
 import time
 
+#P(s'|s,a)
+
 #transition matrix 
+
 def Prob(z):
     P = np.zeros((2,2,2))
     P[1,:,0] = 0.3
@@ -12,7 +15,6 @@ def Prob(z):
     P[0,1,1] = 0.3+z[1]*0.55
     P[0,1,0] = 0.7-0.55* z[1]
     return P
-
 
 
 class Game:
@@ -25,9 +27,9 @@ class Game:
         #mu is the initial state distribution (which is a matrix)
         self.nstate = 2
         self.naction = 2
-        self.pi = pi
-        self.mean_field = mu
-        self.w = W
+        self.pi = pi #(2,2,2)
+        self.mean_field = mu #(2,2)
+        self.w = W # (2,2)
         self.discount = 0.95
         self.z = np.zeros((2,2))
         #we set the population number as 2 for the time being 
@@ -47,7 +49,7 @@ class Game:
 
     def reward(self,s,a,k):
         if k==0 or k==1:
-            return -self.r[k]*(s)-a + self.scale[k]* self.mean_field[k,s]
+            return -self.r[k]*(s==1) -(a==0) + self.scale[k]* self.mean_field[k,s]
             
         else:
             print("Error")
@@ -67,7 +69,7 @@ class Game:
         P = Prob(z)
         return P
 
-#under the current policy for the k th population, the state transition matrix 
+#under the current policy for the k th population, the state transition matrix  P(s'|s)
     def get_transition(self,k):
       # this function is used to for the policy evaluation
         transition = np.zeros((self.nstate,self.nstate))
@@ -182,7 +184,7 @@ for iter in range(100000):
           #use policy mirror ascent to update the policy 
             temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
     obj.pi = temp.copy()
-    print(temp)
+    # print(temp)
     tol = min(tol,np.max((np.abs(pi_temp-temp))))
     policy_lst.append(temp)
     x  = obj.mean_field.copy()
