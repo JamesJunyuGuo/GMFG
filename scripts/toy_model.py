@@ -5,15 +5,40 @@ import time
 #P(s'|s,a)
 
 #transition matrix 
+import logging
+
+def setup_logger(name, log_file=None, level=logging.INFO):
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    
+    # Create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    
+    # Create file handler and set level to debug
+    if log_file:
+        fh = logging.FileHandler(log_file)
+        fh.setLevel(level)
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+    
+    return logger
+
+
+
 
 def Prob(z):
     P = np.zeros((2,2,2))
     P[1,:,0] = 0.3
     P[1,:,1] = 0.7
-    P[0,0,1] = z[1]*0.8+0.1
-    P[0,0,0] = 0.9- z[1]*0.8
-    P[0,1,1] = 0.3+z[1]*0.55
-    P[0,1,0] = 0.7-0.55* z[1]
+    P[0,1,1] = z[1]*0.8+0.1
+    P[0,1,0] = 0.9- z[1]*0.8
+    P[0,0,1] = 0.3+z[1]*0.55
+    P[0,0,0] = 0.7-0.55* z[1]
     return P
 
 
@@ -36,7 +61,7 @@ class Game:
         self.K = K
         self.r = r
         #this is the scale of the regulizer 
-        self.lam = 0.1
+        self.lam = 0.2
         self.scale = scale
         self.update_z()
 
@@ -148,51 +173,56 @@ class Game:
         interval = (0,1)
         ans = minimize_scalar(func, bounds=interval, method='bounded')
         return np.array([ans.x,1-ans.x])
-
-r = [3,3]
-K = len(r)
-scale = [-0.5,0.5]
-mu = np.array([[0.75,0.25],[0.8,0.2]])
-pi1 = np.array([[0.9,0.1],[0.2,0.8]])
-pi2 = np.array([[0.4,0.6],[0.5,0.5]])
-pi = np.array([pi1,pi2])
-W = np.eye(K)*0.2 + np.ones((K,K))*0.4
-obj = Game(W,mu,r,pi,K,scale)
-tol = 1
-obj.lam = 0.5
-MAX_ITER = 100000
-
-lr = [0.2*10/(i+10) for i in range(MAX_ITER)]
-policy_lst = []
-mf_lst = []
-
-
-for iter in range(100000):
-    t1 = time.time()
-  #Initialize the mean field in each iteration 
-    obj.mean_field = mu
-    #obtain the stabilized mean field under the current policy 
-    obj.pop_inf()
-    # obtain the aggregate effect 
-    obj.update_z()
-    #initialize the updated policy
-    temp = np.zeros((obj.K,2,2))
-    pi_temp = obj.pi
-    for k in range(obj.K):
-        # print(obj.Gamma_q_func(k))
-        for s in range(2):
-          #use policy mirror ascent to update the policy 
-            temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
-    obj.pi = temp.copy()
-    # print(temp)
-    tol = min(tol,np.max((np.abs(pi_temp-temp))))
-    policy_lst.append(temp)
-    x  = obj.mean_field.copy()
-    mf_lst.append(x.copy())
-    del temp,x 
-
-    if tol<1e-4:
-        print("The best converge is {}".format(tol))
-        break 
     
-print(obj.pi)
+    
+    
+# Example usage:
+if __name__ == "__main__":
+    logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
+    r = [3,3]
+    K = len(r)
+    scale = [-0.5,0.5]
+    mu = np.array([[0.75,0.25],[0.8,0.2]])
+    pi1 = np.array([[0.9,0.1],[0.2,0.8]])
+    pi2 = np.array([[0.4,0.6],[0.5,0.5]])
+    pi = np.array([pi1,pi2])
+    W = np.eye(K)*0.2 + np.ones((K,K))*0.4
+    obj = Game(W,mu,r,pi,K,scale)
+    logger.info("Initializing the Game")
+    tol = 1
+    obj.lam = 0.5
+    MAX_ITER = 100000
+
+    lr = [0.2*10/(i+10) for i in range(MAX_ITER)]
+    policy_lst = []
+    mf_lst = []
+
+
+    # for iter in range(100000):
+    #     t1 = time.time()
+    # #Initialize the mean field in each iteration 
+    #     obj.mean_field = mu
+    #     #obtain the stabilized mean field under the current policy 
+    #     obj.pop_inf()
+    #     # obtain the aggregate effect 
+    #     obj.update_z()
+    #     #initialize the updated policy
+    #     temp = np.zeros((obj.K,2,2))
+    #     pi_temp = obj.pi
+    #     for k in range(obj.K):
+    #         # print(obj.Gamma_q_func(k))
+    #         for s in range(2):
+    #         #use policy mirror ascent to update the policy 
+    #             temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
+    #     obj.pi = temp.copy()
+    #     # print(temp)
+    #     tol = min(tol,np.max((np.abs(pi_temp-temp))))
+    #     policy_lst.append(temp)
+    #     x  = obj.mean_field.copy()
+    #     mf_lst.append(x.copy())
+    #     del temp,x 
+
+    #     if tol<1e-4:
+    #         print("The best converge is {}".format(tol))
+    #         break 
+        
