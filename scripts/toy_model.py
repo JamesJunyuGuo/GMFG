@@ -174,21 +174,21 @@ class Game:
 # Example usage:
 if __name__ == "__main__":
     logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
-    r = [5,5]
+    r = [2,2]
     K = len(r)
     mu = np.array([[0.75,0.25],[0.8,0.2]])
     pi1 = np.array([[0.9,0.1],[0.2,0.8]])
     pi2 = np.array([[0.4,0.6],[0.5,0.5]])
     pi = np.array([pi1,pi2])
     W = np.eye(K)*0.2 + np.ones((K,K))*0.4
-    scale = [3,-3]
+    scale = [-0.3,0.3]
     obj = Game(W,mu,r,pi,K,scale)
     logger.info("Initializing the Game")
     tol = 1
-    obj.lam = 0.5
+    obj.lam = 0.2
     MAX_ITER = 100000
 
-    lr = [0.2*10/(i+10) for i in range(MAX_ITER)]
+    lr = [0.1*100/(i+100) for i in range(MAX_ITER)]
     policy_lst = []
     mf_lst = []
 

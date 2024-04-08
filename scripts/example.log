@@ -19,3 +19,25 @@
 2024-04-08 20:21:32,290 - example_logger - INFO - The best converge is 9.181239642179484e-05
 2024-04-08 20:31:31,337 - example_logger - INFO - Initializing the Game
 2024-04-08 20:31:35,232 - example_logger - INFO - The best converge is 9.633409554510308e-07
+2024-04-08 20:34:55,941 - example_logger - INFO - Initializing the Game
+2024-04-08 20:34:59,831 - example_logger - INFO - The best converge is 9.633408524223341e-07
+2024-04-08 20:36:13,835 - example_logger - INFO - Initializing the Game
+2024-04-08 20:36:14,739 - example_logger - INFO - The best converge is 6.303817557951064e-07
+2024-04-08 20:36:33,400 - example_logger - INFO - Initializing the Game
+2024-04-08 20:36:36,586 - example_logger - INFO - The best converge is 9.991300394807112e-07
+2024-04-08 20:36:56,222 - example_logger - INFO - Initializing the Game
+2024-04-08 20:36:58,920 - example_logger - INFO - The best converge is 9.521698975945014e-07
+2024-04-08 20:37:27,279 - example_logger - INFO - Initializing the Game
+2024-04-08 20:37:30,787 - example_logger - INFO - The best converge is 9.633408919462738e-07
+2024-04-08 20:37:54,289 - example_logger - INFO - Initializing the Game
+2024-04-08 20:37:57,721 - example_logger - INFO - The best converge is 9.633409481235589e-07
+2024-04-08 20:41:31,368 - example_logger - INFO - Initializing the Game
+2024-04-08 20:41:43,699 - example_logger - INFO - The best converge is 9.96878893350095e-07
+2024-04-08 20:42:01,558 - example_logger - INFO - Initializing the Game
+2024-04-08 20:42:10,234 - example_logger - INFO - The best converge is 9.924833023200463e-07
+2024-04-08 20:42:28,512 - example_logger - INFO - Initializing the Game
+2024-04-08 20:42:38,110 - example_logger - INFO - The best converge is 9.938319461277878e-07
+2024-04-08 20:42:52,684 - example_logger - INFO - Initializing the Game
+2024-04-08 20:43:38,675 - example_logger - INFO - The best converge is 9.99031578519105e-07
+2024-04-08 20:44:15,646 - example_logger - INFO - Initializing the Game
+2024-04-08 20:44:25,813 - example_logger - INFO - The best converge is 9.959917262047924e-07
