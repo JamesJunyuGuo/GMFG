@@ -180,7 +180,7 @@ if __name__ == "__main__":
     pi1 = np.array([[0.9,0.1],[0.2,0.8]])
     pi2 = np.array([[0.4,0.6],[0.5,0.5]])
     pi = np.array([pi1,pi2])
-    W = np.eye(K)*0.2 + np.ones((K,K))*0.4
+    W = np.eye(K)*0.2 + np.ones((K,K))*0.6
     scale = [-0.3,0.3]
     obj = Game(W,mu,r,pi,K,scale)
     logger.info("Initializing the Game")
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     obj.lam = 0.2
     MAX_ITER = 100000
 
-    lr = [0.1*100/(i+100) for i in range(MAX_ITER)]
+    lr = [2/((1-obj.discount)*(i)+16*(1+obj.discount)**2/(1-obj.discount)/0.1) for i in range(MAX_ITER)]
     policy_lst = []
     mf_lst = []
 
@@ -202,11 +202,11 @@ if __name__ == "__main__":
         # obtain the aggregate effect 
         obj.update_z()
         #initialize the updated policy
-        temp = np.zeros((obj.K,2,2))
+        temp = np.zeros((obj.K,obj.nstate,obj.naction))
         pi_temp = obj.pi
         for k in range(obj.K):
             # print(obj.Gamma_q_func(k))
-            for s in range(2):
+            for s in range(obj.nstate):
             #use policy mirror ascent to update the policy 
                 temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
         obj.pi = temp.copy()
@@ -215,9 +215,12 @@ if __name__ == "__main__":
         x  = obj.mean_field.copy()
         mf_lst.append(x.copy())
         del temp,x 
-        print("The converge level is ",tol)
+        
+        if (iter+1)% 100 ==0:
+            logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
+        
 
-        if tol<1e-6:
+        if tol<1e-5*4:
             logger.info("The best converge is {}".format(tol))
             break 
     print("print policy")

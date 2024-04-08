@@ -41,3 +41,26 @@
 2024-04-08 20:43:38,675 - example_logger - INFO - The best converge is 9.99031578519105e-07
 2024-04-08 20:44:15,646 - example_logger - INFO - Initializing the Game
 2024-04-08 20:44:25,813 - example_logger - INFO - The best converge is 9.959917262047924e-07
+2024-04-08 20:54:03,989 - example_logger - INFO - Initializing the Game
+2024-04-08 20:54:23,729 - example_logger - INFO - The best converge is 9.937733277953775e-07
+2024-04-08 20:59:07,035 - example_logger - INFO - Initializing the Game
+2024-04-08 21:05:51,405 - example_logger - INFO - Initializing the Game
+2024-04-08 21:06:29,300 - example_logger - INFO - Initializing the Game
+2024-04-08 21:06:58,818 - example_logger - INFO - Initializing the Game
+2024-04-08 21:07:06,962 - example_logger - INFO - The best converge is 8.097599184053728e-05 in iteration 200
+2024-04-08 21:07:14,929 - example_logger - INFO - Initializing the Game
+2024-04-08 21:07:17,648 - example_logger - INFO - The best converge is 8.157719533896657e-05 in iteration 100
+2024-04-08 21:07:20,516 - example_logger - INFO - The best converge is 8.097599184053728e-05 in iteration 200
+2024-04-08 21:07:23,077 - example_logger - INFO - The best converge is 8.037946311983957e-05 in iteration 300
+2024-04-08 21:07:25,726 - example_logger - INFO - The best converge is 7.9787570930967e-05 in iteration 400
+2024-04-08 21:07:28,477 - example_logger - INFO - The best converge is 7.920027735652813e-05 in iteration 500
+2024-04-08 21:07:31,121 - example_logger - INFO - The best converge is 7.861754480464889e-05 in iteration 600
+2024-04-08 21:07:33,936 - example_logger - INFO - The best converge is 7.803933600564195e-05 in iteration 700
+2024-04-08 21:07:36,699 - example_logger - INFO - The best converge is 7.746561400989727e-05 in iteration 800
+2024-04-08 21:07:39,265 - example_logger - INFO - The best converge is 7.689634218416286e-05 in iteration 900
+2024-04-08 21:07:42,058 - example_logger - INFO - The best converge is 7.633148420926883e-05 in iteration 1000
+2024-04-08 21:07:44,831 - example_logger - INFO - The best converge is 7.57710040772408e-05 in iteration 1100
+2024-04-08 21:07:47,281 - example_logger - INFO - The best converge is 7.52148660883023e-05 in iteration 1200
+2024-04-08 21:07:49,987 - example_logger - INFO - The best converge is 7.466303484809922e-05 in iteration 1300
+2024-04-08 21:07:52,816 - example_logger - INFO - The best converge is 7.411547526531281e-05 in iteration 1400
+2024-04-08 21:07:55,484 - example_logger - INFO - The best converge is 7.35721525485511e-05 in iteration 1500
