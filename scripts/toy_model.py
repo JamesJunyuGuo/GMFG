@@ -1,8 +1,6 @@
-
-
 import numpy as np
 from scipy.optimize import minimize_scalar
-
+import time
 
 #transition matrix 
 def Prob(z):
@@ -18,7 +16,7 @@ def Prob(z):
 
 
 class Game:
-    def __init__(self,W,mu,pi,r,K=2):
+    def __init__(self,W,mu,r, pi,K=2,scale = [0.5,-0.5]):
 
         #W is the connection matrix
         #K is the number of clusters
@@ -37,6 +35,7 @@ class Game:
         self.r = r
         #this is the scale of the regulizer 
         self.lam = 0.1
+        self.scale = scale
         self.update_z()
 
     def h_func(self,x):
@@ -48,7 +47,7 @@ class Game:
 
     def reward(self,s,a,k):
         if k==0 or k==1:
-            return -self.r[k]*(s)-a
+            return -self.r[k]*(s)-a + self.scale[k]* self.mean_field[k,s]
             
         else:
             print("Error")
@@ -98,12 +97,12 @@ class Game:
 
 
     def Vh_func(self,k):
-      #use policy evaluation to compute the regularized value function
+      #use policy evaluation to compute the regularized value function, solve the regularized value function 
         P = self.get_transition(k)
         reward = np.zeros((self.nstate))
         for state in range(self.nstate):
             #compute the expection of the reward
-            reward[state] += self.h_func(pi[k,state,:])
+            reward[state] += self.h_func(self.pi[k,state,:])
             for action in range(self.naction):
                 reward[state] += self.reward(state, action,k)*self.pi[k,state,action]
         A = np.zeros((self.nstate,self.nstate))
@@ -148,5 +147,50 @@ class Game:
         ans = minimize_scalar(func, bounds=interval, method='bounded')
         return np.array([ans.x,1-ans.x])
 
+r = [3,3]
+K = len(r)
+scale = [-0.5,0.5]
+mu = np.array([[0.75,0.25],[0.8,0.2]])
+pi1 = np.array([[0.9,0.1],[0.2,0.8]])
+pi2 = np.array([[0.4,0.6],[0.5,0.5]])
+pi = np.array([pi1,pi2])
+W = np.eye(K)*0.2 + np.ones((K,K))*0.4
+obj = Game(W,mu,r,pi,K,scale)
+tol = 1
+obj.lam = 0.5
+MAX_ITER = 100000
 
-print(np.zeros((2,2)))
+lr = [0.2*10/(i+10) for i in range(MAX_ITER)]
+policy_lst = []
+mf_lst = []
+
+
+for iter in range(100000):
+    t1 = time.time()
+  #Initialize the mean field in each iteration 
+    obj.mean_field = mu
+    #obtain the stabilized mean field under the current policy 
+    obj.pop_inf()
+    # obtain the aggregate effect 
+    obj.update_z()
+    #initialize the updated policy
+    temp = np.zeros((obj.K,2,2))
+    pi_temp = obj.pi
+    for k in range(obj.K):
+        # print(obj.Gamma_q_func(k))
+        for s in range(2):
+          #use policy mirror ascent to update the policy 
+            temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
+    obj.pi = temp.copy()
+    print(temp)
+    tol = min(tol,np.max((np.abs(pi_temp-temp))))
+    policy_lst.append(temp)
+    x  = obj.mean_field.copy()
+    mf_lst.append(x.copy())
+    del temp,x 
+
+    if tol<1e-4:
+        print("The best converge is {}".format(tol))
+        break 
+    
+print(obj.pi)
