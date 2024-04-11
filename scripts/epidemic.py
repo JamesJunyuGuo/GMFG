@@ -54,54 +54,42 @@ class Game:
         self.z = np.zeros((2,2))
         #we set the population number as 2 for the time being 
         self.K = K
-        self.r = np.array(r)
+        self.r = r
         #this is the scale of the regulizer 
         self.lam = 0.2
         self.scale = scale
         self.update_z()
-        R_max = np.max(abs(self.r))
-        self.R_max = R_max + 2
-        
 
     def h_func(self,x):
-        '''
-        Define the regulizer, where x is the policy
-        this functino is strongly convex with respect to x 
-        '''
-    
+    #regulizer
+    #x is the policy 
         return -(x*np.log(x)).sum()*self.lam
-      
+        # this function is strongly convex corresponding to x
 
 
     def reward(self,s,a,k):
-        
         if k==0 or k==1:
-            return -self.r[k]*(s==1) -(a==0) + self.scale[k]* np.log(self.mean_field[k,s])+ self.R_max
+            return -self.r[k]*(s==1) -(a==0) + self.scale[k]* np.log(self.mean_field[k,s])
             
         else:
             print("Error")
-    '''
-    This is the reward function for the kth population
-    H = 0(Healthy) ,S =1 (Sick)
-    Y =0 (Yes) , N =1 (Not)
-    '''
             
+      #this is the reward function for the kth population
+    # H = 0(Healthy) ,S =1 (Sick)
+    # Y =0 (Yes) , N =1 (Not)
     def update_z(self):
       self.z = self.w @self.mean_field 
       self.z /= self.K
       
-    '''
-     define the transition Matrix P( |s,a,z)
-     Under the current policy for the k th population, the state transition matrix  P(s'|s)
-    '''
     
-   
+    
+    #define the transition Matrix P( |s,a,z)
     def transition(self,k):
         z = self.z[k]
         P = Prob(z)
         return P
 
-
+#under the current policy for the k th population, the state transition matrix  P(s'|s)
     def get_transition(self,k):
       # this function is used to for the policy evaluation
         transition = np.zeros((self.nstate,self.nstate))
@@ -112,10 +100,8 @@ class Game:
 
 
     def Population_update(self):
-        '''
-        One step population update for the k clusters
-        pi is a mixed policy here
-        '''
+        #one step population update for the k clusters
+        #pi is a mixed policy here
         ans = np.zeros((self.K,self.nstate))
         for k in range(self.K):
             P = self.transition(k)
@@ -127,17 +113,13 @@ class Game:
       
       
     def pop_inf(self,iter =1000):
-        '''
-        this is the stabilized populaion distribution under the current policy
-        '''
+      #this is the stabilized populaion distribution under the current policy
         for i in range(iter):
             self.Population_update()
 
 
     def Vh_func(self,k):
-        '''
-        use policy evaluation to compute the regularized value function, solve the regularized value function 
-        '''
+      #use policy evaluation to compute the regularized value function, solve the regularized value function 
         P = self.get_transition(k)
         reward = np.zeros((self.nstate))
         for state in range(self.nstate):
@@ -190,9 +172,8 @@ class Game:
     
     def OMD(self,k,s,tau=0.5):
         vec = np.zeros((self.naction))
-        vec = self.Gamma_q_func(k)[s]
-        # for i in range(len(vec)):
-        #     vec[i] = self.Qh_func(s,i,k)
+        for i in range(len(vec)):
+            vec[i] = self.Qh_func(s,i,k)
         
         def softmax(input):
             input -= np.max(input)
@@ -205,7 +186,7 @@ class Game:
         return ans 
     
 
-
+    
 # Example usage:
 if __name__ == "__main__":
     logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
@@ -263,70 +244,4 @@ if __name__ == "__main__":
     print(obj.pi)
     print("print mean field")
     print(obj.mean_field)
-        
-    
-# Train_mode = 'PMA'  
-    
-# # Example usage:
-# if __name__ == "__main__":
-#     logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
-#     r = [2,2]
-#     K = len(r)
-#     mu = np.array([[0.75,0.25],[0.8,0.2]])
-#     pi1 = np.array([[0.5,0.5],[0.5,0.5]])
-#     pi2 = np.array([[0.5,0.5],[0.5,0.5]])
-#     pi = np.array([pi1,pi2])
-#     W = np.eye(K)*0.2 + np.ones((K,K))*0.6
-#     scale = [-0.5,0.5]
-#     obj = Game(W,mu,r,pi,K,scale)
-#     logger.info("Initializing the Game")
-#     tol =2
-#     obj.lam = 0.5
-#     MAX_ITER = 100000
-
-#     lr_lst = [0.3*100/(i+100) for i in range(MAX_ITER)]
-#     tau = 1
-#     policy_lst = []
-#     mf_lst = []
-#     '''
-#     In each iteration, we first obtain the stable mean field under the current policy,
-#     and then we use the Q-Learning algorithm to obtain the Q-function
-#     Finally, we leverage the PMA algorithm to update the policy
-#     '''
-
-
-#     for iter in range(100000):
-#         t1 = time.time()
-#         obj.mean_field = mu
-#         obj.pop_inf()
-#         obj.update_z()
-        
-#         '''
-#         Initialize the Mean Field and update the aggregate impact 
-#         '''
-#         temp = np.zeros((obj.K,obj.nstate,obj.naction))
-#         pi_temp = obj.pi.copy()
-#         for k in range(obj.K):
-#             for s in range(obj.nstate):
-#                 if Train_mode == 'OMD':
-#                     temp[k,s,:] = obj.OMD(k,s,tau)
-#                 else:
-#                     temp[k,s,:] = (obj.mirror(k, s, eta=lr_lst[iter]).copy())
-#         obj.pi = temp.copy()
-#         tol = min(tol,np.sum((np.abs(pi_temp-temp))))
-#         policy_lst.append(temp)
-#         x  = obj.mean_field.copy()
-#         mf_lst.append(x.copy())
-#         del temp,x 
-#         if (iter+1)% 100 ==0:
-#             logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
-#         if tol<1e-5:
-#             logger.info("The best converge is {}".format(tol))
-#             break 
-#     print("Total iteration is", iter)
-   
-#     print("print policy")
-#     print(obj.pi)
-#     print("print mean field")
-#     print(obj.mean_field)
         
