@@ -61,7 +61,7 @@ solver4 = DiscretizedGraphonExactOMDSolverFinite(**{'num_alphas':num_alphas})
 # solver5 = PPOSolver(**{'total_iteration':20,'eta':0.2})
 
 eval_solver = reg_DiscretizedGraphonExactSolverFinite(**{'regularization':regularization,'num_alphas':num_alphas,'eta':2})
-iterations = 50
+iterations = 25
 
 big_logs = {}
 
