@@ -2,9 +2,10 @@ import numpy as np
 import ray
 import torch
 from ray.rllib.agents.ppo import ppo
+# from ray.rllib.algorithms.ppo import PPO as ppo 
+# from ray.rllib.algorithms.ppo import PPOTrainer, DEFAULT_CONFIG
 from ray.rllib.models.preprocessors import get_preprocessor
 from ray.tune import register_env
-
 from games.base import MeanFieldGame
 from games.mfg_wrapper import MFGGymWrapper
 from simulator.mean_fields.base import MeanField
@@ -30,7 +31,7 @@ class PPOSolver(Solver):
             return MFGGymWrapper(game, None, time_obs_augment=True)
 
         register_env("MFG-v0", env_creator)
-        trainer = ppo.PPOTrainer(env="MFG-v0")
+        trainer = PPOTrainer(env="MFG-v0")
         trainer.load_checkpoint(checkpoint)
 
         class TrainerFeedbackPolicyPPO(FiniteFeedbackPolicy):
@@ -58,8 +59,17 @@ class PPOSolver(Solver):
     def solve(self, game: MeanFieldGame, mu: MeanField, **config):
         def env_creator(env_config=None):
             return MFGGymWrapper(game, mu, time_obs_augment=True)
-
+        
         register_env("MFG-v0", env_creator)
+        
+        # config_1 = PPOConfig(
+        #     gamma=1,
+        #     entropy_coeff =0.01,
+        #     clip_param=0.2,
+        #     kl_target=0.006,
+        # )
+        # trainer = PPOTrainer(env="MFG-v0",config=config_1)
+        
         trainer = ppo.PPOTrainer(env="MFG-v0", config={
             'num_workers': 6,
             "gamma": 1,
@@ -67,7 +77,7 @@ class PPOSolver(Solver):
             "clip_param": 0.2,
             "kl_target": 0.006,
         })
-        #TODO: check num_workers
+    
 
         logs = []
         for iteration in range(self.total_iterations):

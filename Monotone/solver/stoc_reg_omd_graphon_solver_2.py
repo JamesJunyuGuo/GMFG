@@ -15,6 +15,7 @@ from games.mfg_wrapper import MFGGymWrapper
 class stoc_reg_DiscretizedGraphonExactOMDSolverFinite_2(Solver):
     """
     Exact OMD solutions for finite state spaces
+    use OMD to solve for the exact solutions
     """
 
     def __init__(self, eta=1, num_alphas=20, regularization=1, K=20,**kwargs):
@@ -89,6 +90,8 @@ class stoc_reg_DiscretizedGraphonExactOMDSolverFinite_2(Solver):
                     #Q_tx_pi = [mfg.reward(t, x, u, mu) + (1 - mfg.done(t, x, u, mu)) *
                     #           np.vdot(curr_V, mfg.transition_probs(t, x, u, mu))
                     #           for u in range(mfg.agent_action_space.n)]
+                    
+                    #The Q-function at time t is Q_t_pi
                     Q_t_pi.append(Q_tx_pi)
 
                 #curr_V = [np.vdot(Q_t_pi[x], pi.pmf(t, tuple([alpha, x]))) for x in range(len(curr_V))]

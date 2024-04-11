@@ -7,7 +7,9 @@ class ChainedTupleDistribution:
     def __init__(self, dist1, dist2):
         self.dist1 = dist1
         self.dist2 = dist2
-
+'''
+Define the MFG
+'''
 
 class MeanFieldGame(ABC):
     """

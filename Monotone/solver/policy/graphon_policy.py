@@ -30,5 +30,6 @@ class DiscretizedGraphonFeedbackPolicy(FeedbackPolicy):
         :param x: observation
         :return: action pmf
         """
+        
         alpha_bin = (np.abs(self.alphas - x[0])).argmin()
         return self.policies_alpha[alpha_bin].pmf(t, x[1])

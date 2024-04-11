@@ -72,7 +72,9 @@ class FiniteGraphonMeanFieldGame(GraphonMeanFieldGame, ABC):
         pass
 
     def reward(self, t, x, u, mu):
-        return self.reward_g(t, x, u, self.get_neighborhood_mf(t, x, u, mu))
+        return self.reward_g(t, x, u, mu)
+        
+        # return self.reward_g(t, x, u, self.get_neighborhood_mf(t, x, u, mu))
 
     def transition_probs(self, t, x, u, mu: MeanField):
         """

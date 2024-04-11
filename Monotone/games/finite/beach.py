@@ -33,7 +33,12 @@ class BeachGraphon(FiniteGraphonMeanFieldGame):
         return transition_probs
 
     def reward_g(self, t, x, u, g):
+        eps = 10e-10
+        alpha = x[0]
+        index = np.argmin(abs(g.alphas-alpha))
+        mu_1 = g.mu_alphas[index].mus[t][x[1]]
         r_x = -abs(x[1] - self.N_states/2) / (self.N_states/2)
         r_a = -((u==0) + (u==2)) / (self.N_states/2)
-        r_mu = -g.evaluate_integral(t, lambda dy: dy[1] == x[1]) * 8
+        r_mu = np.log(mu_1+eps)
+        # r_mu = -g.evaluate_integral(t, lambda dy: dy[1] == x[1]) * 8
         return r_x + r_a + r_mu

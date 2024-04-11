@@ -52,5 +52,12 @@ class QSoftMaxPolicy(FiniteFeedbackPolicy):
         self.tau = tau
 
     def pmf(self, t, x):
+        # print(len(self.Qs[0]))
+        # print("print the type of the Qs")
+        
         Qs_norm = self.Qs[t][x] - max(self.Qs[t][x])
+        '''
+        tau is the tuning parameter using the softmax policy
+        
+        '''
         return np.exp(self.tau * np.array(Qs_norm)) / sum(np.exp(self.tau * np.array(Qs_norm)))

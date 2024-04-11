@@ -177,15 +177,15 @@ if __name__ == "__main__":
     r = [2,2]
     K = len(r)
     mu = np.array([[0.75,0.25],[0.8,0.2]])
-    pi1 = np.array([[0.9,0.1],[0.2,0.8]])
-    pi2 = np.array([[0.4,0.6],[0.5,0.5]])
+    pi1 = np.array([[0.5,0.5],[0.5,0.5]])
+    pi2 = np.array([[0.5,0.5],[0.5,0.5]])
     pi = np.array([pi1,pi2])
     W = np.eye(K)*0.2 + np.ones((K,K))*0.6
-    scale = [-0.3,0.3]
+    scale = [-0.5,0.5]
     obj = Game(W,mu,r,pi,K,scale)
     logger.info("Initializing the Game")
     tol = 1
-    obj.lam = 0.2
+    obj.lam = 0.3
     MAX_ITER = 100000
 
     lr = [2/((1-obj.discount)*(i)+16*(1+obj.discount)**2/(1-obj.discount)/0.1) for i in range(MAX_ITER)]
