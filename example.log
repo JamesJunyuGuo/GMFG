@@ -1,0 +1,5 @@
+2024-04-11 21:56:04,558 - example_logger - INFO - Initializing the Game
+2024-04-11 21:56:08,563 - example_logger - INFO - The best converge is 0.000404628935304234 in iteration 100
+2024-04-11 21:56:12,579 - example_logger - INFO - The best converge is 9.799794605600681e-05 in iteration 200
+2024-04-11 21:56:15,708 - example_logger - INFO - The best converge is 4.2952858936760874e-05 in iteration 300
+2024-04-11 21:56:15,846 - example_logger - INFO - The best converge is 3.7880383302539566e-05

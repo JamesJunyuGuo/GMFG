@@ -170,6 +170,22 @@ class Game:
         return np.array([ans.x,1-ans.x])
     
     
+    def OMD(self,k,s,tau=0.5):
+        vec = np.zeros((self.naction))
+        for i in range(len(vec)):
+            vec[i] = self.Qh_func(s,i,k)
+        
+        def softmax(input):
+            input -= np.max(input)
+            '''
+            Avoid explosion in the exponential computation 
+            '''
+            return np.exp(input)/np.sum(np.exp(input))
+        
+        ans = softmax(tau*vec)
+        return ans 
+    
+    
     
 # Example usage:
 if __name__ == "__main__":
@@ -188,38 +204,38 @@ if __name__ == "__main__":
     obj.lam = 0.3
     MAX_ITER = 100000
 
-    lr = [2/((1-obj.discount)*(i)+16*(1+obj.discount)**2/(1-obj.discount)/0.1) for i in range(MAX_ITER)]
+    lr_lst = [0.2*10/(i+10) for i in range(MAX_ITER)]
     policy_lst = []
     mf_lst = []
+    '''
+    In each iteration, we first obtain the stable mean field under the current policy,
+    and then we use the Q-Learning algorithm to obtain the Q-function
+    Finally, we leverage the PMA algorithm to update the policy
+    '''
 
 
     for iter in range(100000):
         t1 = time.time()
-    #Initialize the mean field in each iteration 
         obj.mean_field = mu
-        #obtain the stabilized mean field under the current policy 
         obj.pop_inf()
-        # obtain the aggregate effect 
         obj.update_z()
-        #initialize the updated policy
+        
+        '''
+        Initialize the Mean Field and update the aggregate impact 
+        '''
         temp = np.zeros((obj.K,obj.nstate,obj.naction))
-        pi_temp = obj.pi
+        pi_temp = obj.pi.copy()
         for k in range(obj.K):
-            # print(obj.Gamma_q_func(k))
             for s in range(obj.nstate):
-            #use policy mirror ascent to update the policy 
-                temp[k,s,:] = (obj.mirror(k, s,eta=lr[iter])).copy()
+                temp[k,s,:] = (obj.mirror(k, s,eta=lr_lst[iter]))
         obj.pi = temp.copy()
-        tol = min(tol,np.max((np.abs(pi_temp-temp))))
+        tol = min(tol,np.sum((np.abs(pi_temp-temp))))
         policy_lst.append(temp)
         x  = obj.mean_field.copy()
         mf_lst.append(x.copy())
         del temp,x 
-        
         if (iter+1)% 100 ==0:
             logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
-        
-
         if tol<1e-5*4:
             logger.info("The best converge is {}".format(tol))
             break 
