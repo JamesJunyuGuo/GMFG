@@ -213,133 +213,28 @@ class GMFG_exact:
         ans = softmax(tau*vec)
         return ans 
     
-
-
-# Example usage:
-if __name__ == "__main__":
-    logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
-    r = [2,2]
-    K = len(r)
-    mu = np.array([[0.75,0.25],[0.8,0.2]])
-    pi1 = np.array([[0.5,0.5],[0.5,0.5]])
-    pi2 = np.array([[0.5,0.5],[0.5,0.5]])
-    pi = np.array([pi1,pi2])
-    W = np.eye(K)*0.2 + np.ones((K,K))*0.6
-    scale = [-0.2,0.2]
-    obj = GMFG_exact(W,mu,r,pi,K,scale)
-    logger.info("Initializing the Game")
-    tol = 1
-    obj.lam = 0.3
-    MAX_ITER = 100000
-
-    lr_lst = [0.2*10/(i+20) for i in range(MAX_ITER)]
-    policy_lst = []
-    mf_lst = []
-    '''
-    In each iteration, we first obtain the stable mean field under the current policy,
-    and then we use the Q-Learning algorithm to obtain the Q-function
-    Finally, we leverage the PMA algorithm to update the policy
-    '''
-
-
-    for iter in range(100000):
-        t1 = time.time()
-        obj.mean_field = mu
-        obj.pop_inf()
-        obj.update_z()
-        
+    def randomized_policy(self):
         '''
-        Initialize the Mean Field and update the aggregate impact 
+        The shape of the policy should be (self.K ,self.nstate,self.naction)
         '''
-        temp = np.zeros((obj.K,obj.nstate,obj.naction))
-        pi_temp = obj.pi.copy()
-        for k in range(obj.K):
-            for s in range(obj.nstate):
-                temp[k,s,:] = (obj.mirror(k, s,eta=lr_lst[iter]))
-        obj.pi = temp.copy()
-        tol = min(tol,np.sum((np.abs(pi_temp-temp))))
-        policy_lst.append(pi_temp)
-        x  = obj.mean_field.copy()
-        mf_lst.append(x.copy())
-        del temp,x
-        if (iter+1)% 100 ==0:
-            logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
-        if tol<1e-5*4:
-            logger.info("The best converge is {}".format(tol))
-            break 
+        random_policy = np.ones((self.K,self.nstate,self.naction))/self.naction
+        self.pi = random_policy
     
-    print("The total iteration number is ", iter)
-    print("print policy")
-    print(obj.pi)
-    print("print mean field")
-    print(obj.mean_field)
-    np.save("./result/mf.npy",np.array(mf_lst))
-    np.save("./result/policy.npy",np.array(policy_lst))
-    
+    def randomized_mf(self):
+        '''
+        The shape of the mean field should be (self.K, self.nstate)
+        '''
+        random_mf = np.ones((self.K,self.nstate))/self.nstate
+        
+        self.mean_field = random_mf
         
     
-# Train_mode = 'PMA'  
+
+def evaluate(game : GMFG_exact,id=0) : 
+    game.randomized_mf()
+    V_func_1 = game.Vh_func(id)
+    return V_func_1@game.mean_field[id] 
     
-# # Example usage:
-# if __name__ == "__main__":
-#     logger = setup_logger("example_logger", log_file="example.log", level=logging.DEBUG)
-#     r = [2,2]
-#     K = len(r)
-#     mu = np.array([[0.75,0.25],[0.8,0.2]])
-#     pi1 = np.array([[0.5,0.5],[0.5,0.5]])
-#     pi2 = np.array([[0.5,0.5],[0.5,0.5]])
-#     pi = np.array([pi1,pi2])
-#     W = np.eye(K)*0.2 + np.ones((K,K))*0.6
-#     scale = [-0.5,0.5]
-#     obj = Game(W,mu,r,pi,K,scale)
-#     logger.info("Initializing the Game")
-#     tol =2
-#     obj.lam = 0.5
-#     MAX_ITER = 100000
+    
 
-#     lr_lst = [0.3*100/(i+100) for i in range(MAX_ITER)]
-#     tau = 1
-#     policy_lst = []
-#     mf_lst = []
-#     '''
-#     In each iteration, we first obtain the stable mean field under the current policy,
-#     and then we use the Q-Learning algorithm to obtain the Q-function
-#     Finally, we leverage the PMA algorithm to update the policy
-#     '''
-
-
-#     for iter in range(100000):
-#         t1 = time.time()
-#         obj.mean_field = mu
-#         obj.pop_inf()
-#         obj.update_z()
-        
-#         '''
-#         Initialize the Mean Field and update the aggregate impact 
-#         '''
-#         temp = np.zeros((obj.K,obj.nstate,obj.naction))
-#         pi_temp = obj.pi.copy()
-#         for k in range(obj.K):
-#             for s in range(obj.nstate):
-#                 if Train_mode == 'OMD':
-#                     temp[k,s,:] = obj.OMD(k,s,tau)
-#                 else:
-#                     temp[k,s,:] = (obj.mirror(k, s, eta=lr_lst[iter]).copy())
-#         obj.pi = temp.copy()
-#         tol = min(tol,np.sum((np.abs(pi_temp-temp))))
-#         policy_lst.append(temp)
-#         x  = obj.mean_field.copy()
-#         mf_lst.append(x.copy())
-#         del temp,x 
-#         if (iter+1)% 100 ==0:
-#             logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
-#         if tol<1e-5:
-#             logger.info("The best converge is {}".format(tol))
-#             break 
-#     print("Total iteration is", iter)
-   
-#     print("print policy")
-#     print(obj.pi)
-#     print("print mean field")
-#     print(obj.mean_field)
-        
+    
