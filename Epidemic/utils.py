@@ -3,6 +3,7 @@ from scipy.optimize import minimize_scalar
 import time
 import logging
 
+
 def setup_logger(name, log_file=None, level=logging.INFO):
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
@@ -234,6 +235,12 @@ def evaluate(game : GMFG_exact,id=0) :
     game.randomized_mf()
     V_func_1 = game.Vh_func(id)
     return V_func_1@game.mean_field[id] 
+
+
+
+
+    
+    
     
     
 

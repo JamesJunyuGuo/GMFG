@@ -229,10 +229,10 @@ if __name__ == "__main__":
     obj = GMFG_exact(W,mu,r,pi,K,scale)
     logger.info("Initializing the Game")
     tol = 1
-    obj.lam = 0.3
+    obj.lam = 0.5
     MAX_ITER = 100000
 
-    lr_lst = [0.2*10/(i+20) for i in range(MAX_ITER)]
+    lr_lst = [2.0 for i in range(MAX_ITER)]
     policy_lst = []
     mf_lst = []
     '''
@@ -264,7 +264,7 @@ if __name__ == "__main__":
         del temp,x
         if (iter+1)% 100 ==0:
             logger.info("The best converge is {} in iteration {}".format(tol,iter+1))
-        if tol<1e-5*4:
+        if tol<1e-8:
             logger.info("The best converge is {}".format(tol))
             break 
     
@@ -273,8 +273,8 @@ if __name__ == "__main__":
     print(obj.pi)
     print("print mean field")
     print(obj.mean_field)
-    np.save("./result/mf.npy",np.array(mf_lst))
-    np.save("./result/policy.npy",np.array(policy_lst))
+    # np.save("./result/mf.npy",np.array(mf_lst))
+    # np.save("./result/policy.npy",np.array(policy_lst))
     
         
     
