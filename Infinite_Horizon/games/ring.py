@@ -32,7 +32,8 @@ class SIR_Game:
         
         self.noise_prob = 0.5
         if Controller:
-            self.bar = Controller.currentaction
+            self.controller = Controller
+            self.bar  = self.nstate/2 
         else:
             self.bar = self.nstate/2 
 
@@ -78,25 +79,28 @@ class SIR_Game:
 
 
     def reward(self,s,a,k):
-        c = [2,1,1]
+        
+        def dis(r):
+            return np.min(r, self.nstate-r)
         if k in range(self.K):
-            r_s = 1- np.abs(s-self.bar)*2/self.nstate
-            r_a = 1 - np.abs(a-1)*2/self.nstate
-            
-            return r_s + r_a
-            
-           
+            self.update_z()
+            if self.controller:
+                self.bar = self.controller.sample()
+                r = np.abs(s-self.bar)
+                r_s = 1- dis(r)*2/self.nstate
+                
+            else: 
+                r = np.abs(s-self.bar)
+                r_s = 1- dis(r)*2/self.nstate
+            r_a =  - np.abs(a-1)*2/self.nstate
+            r_mu = -self.z[k][s]*4
+            return r_s + r_a+r_mu
         else:
             raise ValueError("choose the right population")
-    '''
-    This is the reward function for the kth population
-    H = 0(Healthy) ,S =1 (Sick)
-    Y =0 (Yes) , N =1 (Not)
-    '''
+
             
     def update_z(self):
       self.z = self.w @self.mean_field /self.K 
-    
       
     '''
      define the transition Matrix P( |s,a,z)
