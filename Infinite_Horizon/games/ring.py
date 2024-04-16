@@ -96,7 +96,7 @@ class ring_Game:
                 r_s = 1- dis(r)*2/self.nstate
             r_a =  - np.abs(a-1)*2/self.nstate
             r_mu = -self.z[k][s]*4
-            return 1 + r_a +  r_s + r_mu
+            return 1+  r_a +  r_s + r_mu
         else:
             raise ValueError("choose the right population")
 
