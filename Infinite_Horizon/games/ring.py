@@ -11,7 +11,7 @@ class SIR_Game:
         self.lam is the scale of the regularizer
         '''
 
-        self.nstate = 3
+        self.nstate = 10
         self.naction = 3
         self.K = K
         if pi:
@@ -29,7 +29,12 @@ class SIR_Game:
         self.z = np.zeros((self.K,self.nstate))
         self.lam = 1.0
         self.update_z()
-        self.controller = Controller
+        
+        self.noise_prob = 0.5
+        if Controller:
+            self.bar = Controller.currentaction
+        else:
+            self.bar = self.nstate/2 
 
     def h_func(self,x):
         '''
@@ -51,21 +56,9 @@ class SIR_Game:
     
     def transition_probs(self,k,s,a):
         probs = np.zeros((self.nstate))
-        if s ==0 :
-            self.update_z()
-            probs[1] = self.z[k][1]
-            probs[0] = 1- probs[0]
-            
-        
-        
-        elif s==1:
-            probs[2] = 0.4
-            probs[1] = 1- probs[2]
-            
-        
-        else:
-            probs[0] = 0.4
-            probs[2] = 1 - probs[0]
+        probs[(s+a-1)%self.nstate] = self.noise_prob/2
+        probs[(s+a-1+1)%self.nstate] = 1 - self.noise_prob
+        probs[(s+a+1)%self.nstate] = self.noise_prob/2
             
         return probs  
     
@@ -87,9 +80,12 @@ class SIR_Game:
     def reward(self,s,a,k):
         c = [2,1,1]
         if k in range(self.K):
-            r_a = 1 - (a-1)**2 *0.5 * c[s]
-            r_s = abs(s-1)
-            return r_a + r_s
+            r_s = 1- np.abs(s-self.bar)*2/self.nstate
+            r_a = 1 - np.abs(a-1)*2/self.nstate
+            
+            return r_s + r_a
+            
+           
         else:
             raise ValueError("choose the right population")
     '''
@@ -206,3 +202,8 @@ class SIR_Game:
 
 
    
+
+    
+    
+        
+        
