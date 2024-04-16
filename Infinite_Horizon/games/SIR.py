@@ -54,19 +54,19 @@ class SIR_Game:
         if s ==0 :
             self.update_z()
             probs[1] = self.z[k][1]
-            probs[0] = 1- probs[0]
+            probs[0] = 1- probs[1]
             
         
         
         elif s==1:
             probs[2] = 0.4
-            probs[1] = 1- probs[2]
+            probs[1] = 0.6
+            
             
         
         else:
             probs[0] = 0.4
-            probs[2] = 1 - probs[0]
-            
+            probs[2] = 0.6
         return probs  
     
     '''
@@ -78,7 +78,7 @@ class SIR_Game:
         for s in range(self.nstate):
             for s1 in range(self.nstate):
                 for a in range(self.naction):
-                    transition[s,s1] = self.transition_probs(k,s,a)[s1]@self.pi[k,s,a]
+                    transition[s,s1] += self.transition_probs(k,s,a)[s1]*self.pi[k,s,a]
         return transition
     
       
@@ -106,8 +106,6 @@ class SIR_Game:
      define the transition Matrix P( |s,a,z)
      Under the current policy for the k th population, the state transition matrix  P(s'|s)
     '''
-    
-   
     def Population_update(self):
         '''
         One step population update for the k clusters
@@ -115,15 +113,16 @@ class SIR_Game:
         '''
         ans = np.zeros((self.K,self.nstate))
         for k in range(self.K):
-            P = self.transition(k)
+            
             for s in range(self.nstate):
-                for s1 in range(self.nstate):
-                    ans[k][s] += self.mean_field[k][s1]*self.pi[k][s1]@P[s1,:,s]
+                for a in range(self.naction):
+                    P = self.transition_probs(k,s,a)
+                    ans[k] += self.mean_field[k][s]*self.pi[k][s][a]*P
         self.mean_field = ans.copy()
-        return ans
+        return ans 
       
       
-    def pop_inf(self,iter =1000):
+    def pop_inf(self,iter =100):
         '''
         this is the stabilized populaion distribution under the current policy
         '''
@@ -152,9 +151,8 @@ class SIR_Game:
       #use the regularized value function to compute the regularized q function
         ans = self.reward(s, a, k)+self.h_func(self.pi[k,s,:])
         V = self.Vh_func(k)
-        P = self.transition(k)
-        for s1 in range(self.nstate):
-            ans += self.discount* V[s1]*P[s,a,s1]
+        
+        ans +=self.discount* V@self.transition_probs(k,s,a)
         return ans
 
     def qh_func(self,s,a,k):

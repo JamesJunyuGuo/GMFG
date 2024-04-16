@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import entropy 
 
-class SIR_Game:
+class ring_Game:
     def __init__(self,W,mu=None, pi=None,K=2, Controller = None):
         '''
         W is the connection matrix
@@ -33,8 +33,9 @@ class SIR_Game:
         self.noise_prob = 0.5
         if Controller:
             self.controller = Controller
-            self.bar  = self.nstate/2 
+            self.bar  = self.nstate/2 *1.0
         else:
+            self.controller = None 
             self.bar = self.nstate/2 
 
     def h_func(self,x):
@@ -72,7 +73,7 @@ class SIR_Game:
         for s in range(self.nstate):
             for s1 in range(self.nstate):
                 for a in range(self.naction):
-                    transition[s,s1] = self.transition_probs(k,s,a)[s1]@self.pi[k,s,a]
+                    transition[s,s1] += self.transition_probs(k,s,a)[s1]*self.pi[k,s,a]
         return transition
     
       
@@ -81,20 +82,21 @@ class SIR_Game:
     def reward(self,s,a,k):
         
         def dis(r):
-            return np.min(r, self.nstate-r)
+            return min(r, self.nstate)
         if k in range(self.K):
             self.update_z()
             if self.controller:
                 self.bar = self.controller.sample()
-                r = np.abs(s-self.bar)
+                r = np.abs(s*1.0-self.bar)
                 r_s = 1- dis(r)*2/self.nstate
                 
             else: 
+                
                 r = np.abs(s-self.bar)
                 r_s = 1- dis(r)*2/self.nstate
             r_a =  - np.abs(a-1)*2/self.nstate
             r_mu = -self.z[k][s]*4
-            return r_s + r_a+r_mu
+            return 1 + r_a +  r_s + r_mu
         else:
             raise ValueError("choose the right population")
 
@@ -115,12 +117,13 @@ class SIR_Game:
         '''
         ans = np.zeros((self.K,self.nstate))
         for k in range(self.K):
-            P = self.transition(k)
+            
             for s in range(self.nstate):
-                for s1 in range(self.nstate):
-                    ans[k][s] += self.mean_field[k][s1]*self.pi[k][s1]@P[s1,:,s]
+                for a in range(self.naction):
+                    P = self.transition_probs(k,s,a)
+                    ans[k] += self.mean_field[k][s]*self.pi[k][s][a]*P
         self.mean_field = ans.copy()
-        return ans
+        return ans 
       
       
     def pop_inf(self,iter =1000):
@@ -152,9 +155,8 @@ class SIR_Game:
       #use the regularized value function to compute the regularized q function
         ans = self.reward(s, a, k)+self.h_func(self.pi[k,s,:])
         V = self.Vh_func(k)
-        P = self.transition(k)
-        for s1 in range(self.nstate):
-            ans += self.discount* V[s1]*P[s,a,s1]
+        
+        ans +=self.discount* V@self.transition_probs(k,s,a)
         return ans
 
     def qh_func(self,s,a,k):
