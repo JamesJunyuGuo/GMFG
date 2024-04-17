@@ -58,9 +58,9 @@ class ring_Game:
     
     def transition_probs(self,k,s,a):
         probs = np.zeros((self.nstate))
-        probs[(s+a-1)%self.nstate] = self.noise_prob/2
-        probs[(s+a-1+1)%self.nstate] = 1 - self.noise_prob
-        probs[(s+a+1)%self.nstate] = self.noise_prob/2
+        probs[(s+a-1-1)%self.nstate] = self.noise_prob/2
+        probs[(s+a-1)%self.nstate] = 1 - self.noise_prob
+        probs[(s+a-1+1)%self.nstate] = self.noise_prob/2
             
         return probs  
     
@@ -71,9 +71,8 @@ class ring_Game:
     def get_transition(self,k):
         transition = np.zeros((self.nstate,self.nstate))
         for s in range(self.nstate):
-            for s1 in range(self.nstate):
-                for a in range(self.naction):
-                    transition[s,s1] += self.transition_probs(k,s,a)[s1]*self.pi[k,s,a]
+            for a in range(self.naction):
+                transition[s] += self.transition_probs(k,s,a)*self.pi[k,s,a]
         return transition
     
       

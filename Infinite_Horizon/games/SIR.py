@@ -20,7 +20,7 @@ class SIR_Game:
         else:
             self.pi = self.random_policy()
         if mu:
-            self.mu = mu 
+            self.mean_field = mu 
         else:
             self.mean_field = self.random_mf() #(2,2)
         self.w = W # (2,2)
@@ -30,6 +30,15 @@ class SIR_Game:
         self.lam = 1.0
         self.update_z()
         self.controller = Controller
+    
+    def z_action(self ):
+        res = np.zeros((self.K,  self.naction))
+        for k in range(self.K ):
+        
+            res[k] = self.mean_field[k]@ self.pi[k]
+        
+        z_action = 1/self.K * self.w @res 
+        return z_action
 
     def h_func(self,x):
         '''
@@ -51,9 +60,16 @@ class SIR_Game:
     
     def transition_probs(self,k,s,a):
         probs = np.zeros((self.nstate))
+        z_a = self.z_action()
+        
+        
+        '''
+        we should let the probability of the action determine the transition rate 
+        '''
         if s ==0 :
             self.update_z()
-            probs[1] = self.z[k][1]
+            #placeholder 
+            probs[1] = min(self.z[k][1]*3, 1)
             probs[0] = 1- probs[1]
             
         
@@ -76,14 +92,11 @@ class SIR_Game:
     def get_transition(self,k):
         transition = np.zeros((self.nstate,self.nstate))
         for s in range(self.nstate):
-            for s1 in range(self.nstate):
-                for a in range(self.naction):
-                    transition[s,s1] += self.transition_probs(k,s,a)[s1]*self.pi[k,s,a]
+            for a in range(self.naction):
+                transition[s] += self.transition_probs(k,s,a)*self.pi[k,s,a]
         return transition
     
-      
-
-
+    
     def reward(self,s,a,k):
         c = [2,1,1]
         if k in range(self.K):
