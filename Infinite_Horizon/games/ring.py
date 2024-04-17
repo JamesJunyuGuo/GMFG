@@ -11,7 +11,7 @@ class ring_Game:
         self.lam is the scale of the regularizer
         '''
 
-        self.nstate = 10
+        self.nstate = 11
         self.naction = 3
         self.K = K
         if pi:
@@ -171,7 +171,7 @@ class ring_Game:
         return ans
 
 
-    def mirror(self,k,s,q,eta=0.1):
+    def mirror(self,k,s,q,eta=2):
         prev = self.pi[k,s]
         # q = self.Gamma_q_func(k)[s]
         def softmax(x):
