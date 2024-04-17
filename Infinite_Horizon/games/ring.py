@@ -36,7 +36,7 @@ class ring_Game:
             self.bar  = self.nstate/2 *1.0
         else:
             self.controller = None 
-            self.bar = self.nstate/2 
+            self.bar = (self.nstate-1)/2 
 
     def h_func(self,x):
         '''
@@ -81,7 +81,7 @@ class ring_Game:
     def reward(self,s,a,k):
         
         def dis(r):
-            return min(r, self.nstate)
+            return min(r, self.nstate-r)
         if k in range(self.K):
             self.update_z()
             if self.controller:
