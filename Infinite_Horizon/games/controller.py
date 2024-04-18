@@ -16,10 +16,14 @@ class controller(ABC):
 
 
 class ring_control(controller):
-    def __init__(self, action_space):
+    def __init__(self, action_space,pi = None):
         super().__init__(action_space)
         self.naction = len(action_space)
         self.current_action = 0
+        if pi:
+            self.pi = pi 
+        else:
+            self.pi = self.random_policy()
     
     def random_policy(self):
         return np.ones((self.naction))/self.naction
@@ -28,26 +32,30 @@ class ring_control(controller):
         return entropy(mean_field) 
     
     
+    def sample(self):
+        return np.random.choice(self.naction, 1, p=self.pi).item()
+    
+    
 
-class SIR_controller(controller):
-    def __init__(self, action_space,policy=None):
-        super().__init__(action_space)
-        self.naction = len(action_space)
-        self.current_action = 0
-        if policy:
-            self.pi = policy 
-        else:
-            self.pi = self.random_policy()
+# class SIR_controller(controller):
+#     def __init__(self, action_space,policy=None):
+#         super().__init__(action_space)
+#         self.naction = len(action_space)
+#         self.current_action = 0
+#         if policy:
+#             self.pi = policy 
+#         else:
+#             self.pi = self.random_policy()
     
-    def random_policy(self):
-        return np.ones((self.naction))/self.naction
+#     def random_policy(self):
+#         return np.ones((self.naction))/self.naction
     
-    def reward(self,action,mean_field):
-        return 2*(1-mean_field[1]) + (self.naction-action)
+#     def reward(self,action,mean_field):
+#         return 2*(1-mean_field[1]) + (self.naction-action)
     
-    def sample(self,n=1):
-        bar = np.random.choice(self.naction,n,p = self.pi).item()
-        return bar 
+#     def sample(self,n=1):
+#         bar = np.random.choice(self.naction,n,p = self.pi).item()
+#         return bar 
         
     
     

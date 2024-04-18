@@ -3,15 +3,17 @@ from scipy.optimize import minimize
 from scipy.stats import entropy 
 
 class ring_Game:
-    def __init__(self,W,mu=None, pi=None,K=2, Controller = None):
+    def __init__(self,W,mu=None, pi=None,K=2, Controller = None,nstate=None):
         '''
         W is the connection matrix
         K is the number of clusters
         mu is the initial state distribution (which is a matrix)
         self.lam is the scale of the regularizer
         '''
-
-        self.nstate = 11
+        if nstate:
+            self.nstate = nstate
+        else:
+            self.nstate = 11
         self.naction = 3
         self.K = K
         if pi:
@@ -33,7 +35,7 @@ class ring_Game:
         self.noise_prob = 0.5
         if Controller:
             self.controller = Controller
-            self.bar  = self.nstate/2 *1.0
+            self.bar  = (self.nstate-1)/2 
         else:
             self.controller = None 
             self.bar = (self.nstate-1)/2 
@@ -85,10 +87,10 @@ class ring_Game:
         if k in range(self.K):
             self.update_z()
             if self.controller:
-                self.bar = self.controller.sample()
-                r = np.abs(s*1.0-self.bar)
-                r_s = 1- dis(r)*2/self.nstate
-                
+                r_s = 0
+                for state in range(self.nstate):
+                    r = np.abs(s-state)
+                    r_s += self.controller.pi[s]* (1- dis(r)*2/self.nstate)
             else: 
                 
                 r = np.abs(s-self.bar)
@@ -119,7 +121,9 @@ class ring_Game:
             
             for s in range(self.nstate):
                 for a in range(self.naction):
+                    # print(k,s,a)
                     P = self.transition_probs(k,s,a)
+                    # print(P)
                     ans[k] += self.mean_field[k][s]*self.pi[k][s][a]*P
         self.mean_field = ans.copy()
         return ans 
