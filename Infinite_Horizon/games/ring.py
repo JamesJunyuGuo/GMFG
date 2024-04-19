@@ -87,10 +87,10 @@ class ring_Game:
         if k in range(self.K):
             self.update_z()
             if self.controller:
-                r_s = 0
-                for state in range(self.nstate):
-                    r = np.abs(s-state)
-                    r_s += self.controller.pi[s]* (1- dis(r)*2/self.nstate)
+                r_s = 1.0
+                # for state in range(self.nstate):
+                #     r = np.abs(s-state)
+                #     r_s += self.controller.pi[s]* (1- dis(r)*2/self.nstate)
             else: 
                 
                 r = np.abs(s-self.bar)

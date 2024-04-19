@@ -3,7 +3,7 @@ from games.ring import ring_Game
 from games.controller import ring_control
 import numpy as np 
 import torch 
-
+import time 
 import logging
 import  matplotlib.pyplot as plt 
 plt.style.use('ggplot')
@@ -35,7 +35,7 @@ if __name__=="__main__":
     ])
     K = len(W)
     # control = ring_control(np.arange(11))
-    game = ring_Game(W,K=2,nstate=21)
+    game = ring_Game(W,K=2,nstate=41)
   
 
     '''
@@ -45,10 +45,11 @@ if __name__=="__main__":
 
     mf_lst = [ ]
     policy_lst = [ ]
-    lr = 8.0
+    lr = 5.0
     tol = 1.0 
-    threshold = 1e-4*2
-
+    threshold = 1e-4*3
+    game.lam = 2.0
+    t1 =  time.time()
     for i in range(MAX_ITER):
         '''
         obtain the stable mean field under the current policy, 
@@ -79,6 +80,11 @@ if __name__=="__main__":
             break 
     
     
+    t2 = time.time()
+    with open('result/ring/ring.txt','a') as file:
+        file.write("State number is {}, and the training time is {} seconds\n".format(game.nstate,t2-t1))
+    
+    
     fig,axs = plt.subplots(5,1,dpi=200)
     
     fig,axs = plt.subplots(4,1,dpi=100)
@@ -94,7 +100,7 @@ if __name__=="__main__":
     axs[3].set_title("Turn Right")
 
     fig.tight_layout()
-    plt.savefig("./result/ring_{}.png".format(game.nstate))
+    plt.savefig("./result/ring/ring_{}.png".format(game.nstate))
     plt.show()
         
         

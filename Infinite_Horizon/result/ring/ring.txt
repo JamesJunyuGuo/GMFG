@@ -1,0 +1,15 @@
+This is a file of the ring result. 
+State number is 3, and the training time is 0.425156831741333 seconds
+State number is 5, and the training time is 1.1621825695037842 secondsState number is 7, and the training time is 2.808084011077881 seconds
+State number is 7, and the training time is 2.806723117828369 seconds
+State number is 9, and the training time is 4.6480793952941895 seconds
+State number is 11, and the training time is 6.302793264389038 seconds
+State number is 13, and the training time is 7.14039945602417 seconds
+State number is 15, and the training time is 7.883908033370972 seconds
+State number is 17, and the training time is 7.360002279281616 seconds
+State number is 19, and the training time is 11.015319108963013 seconds
+State number is 21, and the training time is 13.443971633911133 seconds
+State number is 25, and the training time is 13.229178428649902 seconds
+State number is 31, and the training time is 15.517223596572876 seconds
+State number is 35, and the training time is 18.507011651992798 seconds
+State number is 41, and the training time is 27.54809331893921 seconds
