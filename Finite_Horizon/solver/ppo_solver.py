@@ -2,8 +2,8 @@ import numpy as np
 import ray
 import torch
 from ray.rllib.agents.ppo import ppo
-# from ray.rllib.algorithms.ppo import PPO as ppo 
-# from ray.rllib.algorithms.ppo import PPOTrainer, DEFAULT_CONFIG
+from ray.rllib.agents.ppo import PPO as ppo 
+from ray.rllib.agents.ppo import PPOTrainer, DEFAULT_CONFIG
 from ray.rllib.models.preprocessors import get_preprocessor
 from ray.tune import register_env
 from games.base import MeanFieldGame
